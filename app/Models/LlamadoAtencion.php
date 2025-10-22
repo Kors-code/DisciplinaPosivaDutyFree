@@ -5,22 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LlamadoAtencion extends Model
+class Llamado extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'historial_cargo_id', 'fecha', 'motivo', 'descripcion', 'tipo'
-    ];
+    protected $table = 'llamados';
 
-    // 🔗 Relaciones
-    public function historialCargo()
-    {
-        return $this->belongsTo(HistorialCargo::class);
-    }
+    protected $fillable = [
+        'empleado_id','tipo','fecha','descripcion','accion_tomada'
+    ];
 
     public function empleado()
     {
-        return $this->hasOneThrough(Empleado::class, HistorialCargo::class);
+        return $this->belongsTo(Empleado::class, 'empleado_id');
     }
 }

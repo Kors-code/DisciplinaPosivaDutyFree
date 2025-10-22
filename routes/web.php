@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormatoController;
 use App\Http\Controllers\ExcelController;
+use App\Http\Controllers\EmpleadoController;
 
 Route::get('/', function () {
     return redirect()->route('form.show');
@@ -17,4 +18,5 @@ Route::post('/generar-pdf', [FormatoController::class, 'generarPDF'])->name('for
 
 
 Route::get('/import-excel', [ExcelController::class, 'showForm'])->name('excel.form');
-Route::post('/upload-excel', [ExcelController::class, 'import'])->name('excel.import');
+
+Route::post('/upload-excel', [EmpleadoController::class, 'importExcel'])->name('excel.import');

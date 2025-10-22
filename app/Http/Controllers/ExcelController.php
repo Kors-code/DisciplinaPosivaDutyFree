@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Imports\UsuariosImport;
+use App\Imports\EmpleadosImport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Log;
 
 class ExcelController extends Controller
 {
@@ -17,15 +16,15 @@ class ExcelController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
         ]);
-        $file = $request->file('file');
 
-        $collection = Excel::toCollection(null, $file);
+        try {
+            Excel::import(new EmpleadosImport, $request->file('file'));
+        } catch (\Throwable $e) {
+            return back()->withErrors(['file' => 'Error importando: ' . $e->getMessage()]);
+        }
 
-
-        Excel::import(new UsuariosImport, $request->file('file'));
-
-        return back()->with('success', 'Datos importados correctamente.');
+        return back()->with('success', 'Importación completada correctamente.');
     }
 }
