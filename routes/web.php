@@ -20,3 +20,6 @@ Route::post('/generar-pdf', [FormatoController::class, 'generarPDF'])->name('for
 Route::get('/import-excel', [ExcelController::class, 'showForm'])->name('excel.form');
 
 Route::post('/upload-excel', [EmpleadoController::class, 'importExcel'])->name('excel.import');
+
+Route::get('/buscar-empleado/{cedula}', [EmpleadoController::class, 'buscarPorCedula'])
+    ->name('empleado.buscar');
