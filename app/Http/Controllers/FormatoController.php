@@ -16,7 +16,7 @@ class FormatoController extends Controller
             'fecha' => 'required|date',
             'cedula' => 'required|string|max:50',
             'nombre' => 'required|string|max:255',
-            'cargo' => 'nullable|string|max:255',
+            'cargo' => 'required|string|max:255',
             'fecha_evento' => 'required|date',
             'hora' => 'required|string|max:20',
             'fase' => 'required|string|max:255',
@@ -52,17 +52,17 @@ class FormatoController extends Controller
             'firma_empleado' => $validated['firma_empleado'],
             'firma_jefe' => $validated['firma_jefe'],
         ];
-
+        
         // ✅ Generar PDF
         $pdf = Pdf::loadView('plantillaPDF', compact('data'))->setPaper('A4', 'portrait');
-
+        
         // ✅ Crear carpeta si no existe
         Storage::disk('local')->makeDirectory('llamados');
-
+        
         // ✅ Guardar el PDF
         $fileName = 'llamados/llamado_' . $empleado->cedula . '_' . now()->format('Ymd_His') . '.pdf';
         Storage::disk('local')->put($fileName, $pdf->output());
-
+        
         // ✅ Registrar en base de datos
         LlamadoAtencion::create([
             'empleado_id' => $empleado->id,
@@ -70,6 +70,8 @@ class FormatoController extends Controller
             'cedula' => $validated['cedula'],
             'jefe' => $validated['jefe'],
             'jefe_cedula' => $validated['jefe_cedula'],
+            'cargo_jefe' => $validated['cargo_jefe'],
+            'cargo' => $validated['cargo'],
             'fecha' => $validated['fecha'],
             'fecha_evento' => $validated['fecha_evento'],
             'hora' => $validated['hora'],
@@ -82,6 +84,22 @@ class FormatoController extends Controller
 
         // ✅ Descargar PDF
         $path = Storage::disk('local')->path($fileName);
-        return response()->download($path);
+        
+        return back()
+            ->with('success', 'Disciplina Positiva Aplicada con exito ✅')
+            ->with('pdf_path', $fileName); 
+            }
+            public function descargarPDF(Request $request)
+{
+    $path = $request->query('path');
+
+    // Validar que el archivo exista
+    if (!$path || !Storage::disk('local')->exists($path)) {
+        abort(404, 'Archivo no encontrado');
     }
+
+    // Retornar el archivo como descarga
+    return response()->download(Storage::disk('local')->path($path));
+}
+
 }

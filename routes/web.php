@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormatoController;
 use App\Http\Controllers\ExcelController;
@@ -23,3 +25,7 @@ Route::post('/upload-excel', [EmpleadoController::class, 'importExcel'])->name('
 
 Route::get('/buscar-empleado/{cedula}', [EmpleadoController::class, 'buscarPorCedula'])
     ->name('empleado.buscar');
+
+
+Route::get('/descargar-pdf', [FormatoController::class, 'descargarPDF'])->name('descargar.pdf');
+

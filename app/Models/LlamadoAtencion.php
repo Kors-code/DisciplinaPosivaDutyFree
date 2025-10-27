@@ -15,6 +15,8 @@ class LlamadoAtencion extends Model
     'empleado_id',
     'nombre',
     'cedula',
+    'cargo',
+    'cargo_jefe',
     'jefe',
     'jefe_cedula',
     'fecha',

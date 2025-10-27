@@ -34,6 +34,53 @@
       font-size:15px;
     }
 
+    /* ---------- Alert box ---------- */
+ .alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    opacity: 0;
+    z-index: 9999;
+    animation: fadeIn 0.5s forwards, fadeOut 0.5s forwards 3.5s;
+}
+
+.alert-link {
+    color: #fff;
+    text-decoration: underline;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+
     /* ---------- Wrapper ---------- */
     .wrap{max-width:1100px;margin:0 auto}
 
@@ -116,6 +163,28 @@
   </style>
 </head>
 <body>
+   @if (session('success'))
+    <div class="alert">
+        {{ session('success') }}
+        @if (session('pdf_path'))
+            <a href="{{ route('descargar.pdf', ['path' => session('pdf_path')]) }}" class="alert-link">
+                Descargar PDF
+            </a>
+        @endif
+    </div>
+@endif
+
+@if ($errors->any())
+<div class="alert" style="background-color:#ff4d4d;">
+    <ul style="list-style:none; margin:0; padding:0;">
+        @foreach ($errors->all() as $error)
+            <li class="alert-link">{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
+
   <div class="wrap">
     <header style="margin-bottom:10px;align-items:center;display:flex;gap:10px;">
       <div class="logo">DP</div>
@@ -437,5 +506,15 @@
       jefeCedulaInput.addEventListener('blur', handleJefe);
     })();
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const alert = document.getElementById("alert");
+    if (alert) {
+        setTimeout(() => {
+            alert.style.display = "none";
+        }, 4000); // 4 segundos
+    }
+});
+</script>
 </body>
 </html>
