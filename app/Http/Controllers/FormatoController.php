@@ -30,10 +30,16 @@ class FormatoController extends Controller
             'firma_jefe' => 'required',
             'jefe' => 'required|string|max:255',
             'jefe_cedula' => 'required|string|max:50',
+            'cargo_jefe' => 'required|string|max:255',
+            'Proceso' => 'required|string|max:255',
+        
         ]);
 
         $empleado = Empleado::where('cedula', $validated['cedula'])->firstOrFail();
 
+
+        $codigo = substr($validated['Proceso'], 0, 3);
+        $detalleProceso = substr($validated['Proceso'], 4);
         $data = [
 
             'fecha' => $validated['fecha'],
@@ -51,6 +57,8 @@ class FormatoController extends Controller
             'cargo_jefe' => $validated['cargo_jefe'],
             'firma_empleado' => $validated['firma_empleado'],
             'firma_jefe' => $validated['firma_jefe'],
+            'codigo_proceso' => $codigo,
+            'descripcion_proceso' => $detalleProceso,
         ];
         
         // ✅ Generar PDF
@@ -80,13 +88,15 @@ class FormatoController extends Controller
             'orientacion' => $validated['orientacion'],
             'detalle' => $validated['detalle'],
             'ruta_pdf' => $fileName,
+            'codigo' => $codigo,
+            'descripcion' => $detalleProceso,
         ]);
-
+        
         // ✅ Descargar PDF
         $path = Storage::disk('local')->path($fileName);
         
         return back()
-            ->with('success', 'Disciplina Positiva Aplicada con exito ✅')
+        ->with('success', 'Disciplina Positiva Aplicada con exito ✅')
             ->with('pdf_path', $fileName); 
             }
             public function descargarPDF(Request $request)

@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormatoController;
+use App\Http\Controllers\ListController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\AlertaInternaController;
 
 Route::get('/', function () {
     return redirect()->route('form.show');
@@ -28,4 +30,5 @@ Route::get('/buscar-empleado/{cedula}', [EmpleadoController::class, 'buscarPorCe
 
 
 Route::get('/descargar-pdf', [FormatoController::class, 'descargarPDF'])->name('descargar.pdf');
-
+Route::get('/empleados', [ListController::class, 'mostrarEmpleados'])->name('empleados.list');
+Route::get('/Disciplinas', [ListController::class, 'mostrarDisciplinasPositivas'])->name('Disciplinas.list');

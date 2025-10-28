@@ -160,6 +160,47 @@
 
     /* ---------- Accessibility focus ---------- */
     :focus{outline: 3px solid rgba(132,0,40,0.12);outline-offset:2px}
+
+    
+    .select-search {
+  position: relative;
+  width: 100%;
+}
+
+.select-search input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--input-border);
+  color: #eaf6ff;
+  font-size: 15px;
+  outline: none;
+}
+
+.dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #1a1f29;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  margin-top: 4px;
+  display: none;
+  z-index: 10;
+}
+
+.dropdown div {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown div:hover {
+  background: #253042;
+}
+
   </style>
 </head>
 <body>
@@ -208,6 +249,19 @@
                   class="input-fecha">
           </div>
 
+          <!-- ---------------- Searchable motivo select ---------------- -->
+          <div class="field">
+  <label for="motivo">Motivo del llamado de atención</label>
+  <div class="select-search">
+    <input type="text" id="searchMotivo" placeholder="Buscar motivo..." name="Proceso" onkeyup="filtrarMotivos()" />
+    <div class="dropdown" id="motivosDropdown">
+      <!-- Los motivos se llenan dinámicamente -->
+    </div>
+  </div>
+  <input type="hidden" id="motivo" name="motivo" required />
+</div>
+
+
 
           <div class="row" style="align-items:flex-end">
             <div class="col">
@@ -244,7 +298,7 @@
                 <input id="fecha_evento" type="date" name="fecha_evento" value="{{ old('fecha_evento') }}" required>
               </div>
             </div>
-
+            
             <div class="w180">
               <div class="field">
                 <label for="hora">Hora</label>
@@ -516,5 +570,119 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 </script>
+<script>
+const motivos = [
+  // --- 100s ---
+  {codigo: 101, descripcion: "Tardanzas (llegadas tarde, tiempos de descanso sin justificación válida)"},
+  {codigo: 102, descripcion: "No cumplimiento del Presupuesto Mínimo"},
+  {codigo: 103, descripcion: 'Frecuencia de errores "Número de Pasaporte"'},
+  {codigo: 104, descripcion: "Frecuencia en anulación de factura por error del cajero"},
+  {codigo: 105, descripcion: 'Frecuencia de errores "Error en Boarding Pass"'},
+  {codigo: 106, descripcion: "Frecuencia de errores de descuadres en caja por menor valor facturado"},
+  {codigo: 107, descripcion: "Frecuencia de errores de descuadres en caja por mayor valor facturado"},
+  {codigo: 108, descripcion: "Uso inapropiado del código de vestuario en el lugar de trabajo"},
+  {codigo: 109, descripcion: "Incumplimiento en áreas de responsabilidad (precio, surtido, visual y limpieza)"},
+  {codigo: 110, descripcion: "Utilizar dispositivos electrónicos u otros objetos de uso personal en el lugar de trabajo"},
+  {codigo: 111, descripcion: "Recibir dineros u obsequios de cualquier tipo por parte de los clientes en las instalaciones de la compañía"},
+  {codigo: 112, descripcion: "Avería de mercancía por mal manejo"},
+  {codigo: 113, descripcion: "No respetar los procedimientos de seguridad interna"},
+  {codigo: 114, descripcion: "Consumo de alimentos en áreas diferentes a las autorizadas por la compañía"},
+  {codigo: 115, descripcion: "No entregar las tarjetas débito o crédito a los clientes"},
+  {codigo: 116, descripcion: "Guardar mercancía en la tienda posterior a su facturación (excepto cancelación de vuelo)"},
+  {codigo: 117, descripcion: "No diligenciar correctamente los formatos aprobados para los procesos"},
+  {codigo: 118, descripcion: "No cumplir con el orden y aseo en zonas comunes de la compañía"},
+  {codigo: 119, descripcion: "Saltarse los conductos regulares para la comunicación o solución de conflictos"},
+  {codigo: 120, descripcion: "No cumplir con la marcación de la jornada laboral en el sistema"},
+  {codigo: 121, descripcion: "Cambiar la planimetría (merchandising) sin autorización"},
+  {codigo: 122, descripcion: "No realizar los traslados de productos en el sistema"},
+  {codigo: 123, descripcion: "Cambiar de turno u horario laboral sin autorización del Jefe Inmediato"},
+  {codigo: 124, descripcion: "Acumulación de eventos"},
+  {codigo: 125, descripcion: "Error en asignación de tienda en la venta"},
+
+  // --- 200s ---
+  {codigo: 201, descripcion: "Realizar ventas u otras actividades económicas con fines no relacionados con el trabajo (rifas, donativos, ventas por catálogos, etc.) sin previa autorización e incurriendo en pérdidas de tiempo o afectación del relacionamiento laboral"},
+  {codigo: 202, descripcion: "Inadecuado uso de los activos y/o material de la empresa (impresora, celular corporativo, etc.)"},
+  {codigo: 203, descripcion: "Incumplir las normas y procedimientos del Sistema de Gestión de Seguridad y Salud en el Trabajo"},
+  {codigo: 204, descripcion: "No facturar los productos de obsequio que se encuentren registrados en el sistema"},
+  {codigo: 205, descripcion: "Deficiente desempeño en sus tareas y actividades laborales"},
+  {codigo: 206, descripcion: "Incumplimiento en sus tareas y responsabilidades laborales"},
+  {codigo: 207, descripcion: "No abordaje de clientes"},
+  {codigo: 208, descripcion: "No aprovechar los tiempos muertos en actividades propias de la labor"},
+  {codigo: 209, descripcion: "Marcar en el huellero sin estar listo para el inicio de su labor"},
+  {codigo: 210, descripcion: "No marcar correctamente el tiempo de break (calentar los alimentos y posteriormente marcar)"},
+  {codigo: 211, descripcion: "No suministrar información de las restricciones aduaneras respecto a la cantidad de productos a ingresar al país de destino para vuelos directos o con conexión"},
+  {codigo: 212, descripcion: "Asignarse ventas en el sistema y/o tomar clientes que no le corresponden"},
+  {codigo: 213, descripcion: "Facturar un producto y no entregarlo al cliente"},
+  {codigo: 214, descripcion: "No revisar el estado de un producto frente al cliente al momento de entregarlo"},
+  {codigo: 215, descripcion: "No informar los reclamos sobre los productos a su jefe inmediato"},
+  {codigo: 216, descripcion: "No asistir a clases de inglés o no cumplir con las tareas asignadas (salvo personal con certificación vigente)"},
+  {codigo: 217, descripcion: "No realizar el cierre de caja en turno a la media noche"},
+  {codigo: 218, descripcion: "No cumplir con las métricas de desempeño asignadas"},
+
+  // --- 300s ---
+  {codigo: 301, descripcion: "Fumar al interior de las instalaciones o en sus alrededores"},
+  {codigo: 302, descripcion: "Ausencia y/o falta del lugar de trabajo sin autorización o notificación"},
+  {codigo: 303, descripcion: "Actitud irrespetuosa y uso de lenguaje obsceno en el lugar de trabajo con partes interesadas (compañeros, clientes, proveedores, autoridades, etc.)"},
+  {codigo: 304, descripcion: "No saludar al personal del aeropuerto, compañeros, líderes y demás personal interno y externo a la compañía"},
+  {codigo: 305, descripcion: "Acceder, compartir y/o no proteger información sensible o confidencial de manera intencional, sin estar autorizado"},
+  {codigo: 306, descripcion: "Incumplir las normas y procedimientos del operador aeroportuario"},
+  {codigo: 307, descripcion: "Incumplir las directrices sobre servicio al cliente, brindar una mala atención, no atender oportunamente las solicitudes del cliente o negarle deliberadamente el servicio"},
+
+  // --- 400s ---
+  {codigo: 401, descripcion: "Falsificación de documentos e información"},
+  {codigo: 402, descripcion: "Ingerir bebidas alcohólicas en el lugar de trabajo sin autorización"},
+  {codigo: 403, descripcion: "Asistir al trabajo bajo el efecto de bebidas alcohólicas y/o alucinógenas"},
+  {codigo: 404, descripcion: "Destrucción, sustracción o apropiación de propiedad de la empresa, de sus clientes o empleados, o ser cómplice de estos actos"},
+  {codigo: 405, descripcion: "Divulgar, comunicar o transferir códigos de acceso de sistemas electrónicos o de comunicación a otros empleados o personas no relacionadas con la empresa"},
+  {codigo: 406, descripcion: "Agresión física a partes interesadas (compañeros, clientes, proveedores, autoridades, etc.)"},
+  {codigo: 407, descripcion: "Uso, posesión, consumo o distribución de sustancias alucinógenas dentro de las instalaciones de la compañía"},
+  {codigo: 408, descripcion: "Incurrir en hostigamiento sexual, acoso laboral y/o mobbing"},
+  {codigo: 409, descripcion: "Aceptar dineros, obsequios o prebendas para favorecer a terceros"},
+  {codigo: 410, descripcion: "Cambiar los precios de los productos de manera intencional sin previa autorización para propósitos personales o de terceros"},
+  {codigo: 411, descripcion: "Actuar de manera poco ética y transparente o no declarar situaciones de conflicto de interés incumpliendo las políticas de la compañía"},
+];
+
+
+const dropdown = document.getElementById("motivosDropdown");
+const searchInput = document.getElementById("searchMotivo");
+const motivoInput = document.getElementById("motivo");
+
+function mostrarMotivos(lista) {
+  dropdown.innerHTML = "";
+  lista.forEach(m => {
+    const div = document.createElement("div");
+    div.textContent = `${m.codigo} - ${m.descripcion}`;
+    div.onclick = () => seleccionarMotivo(m);
+    dropdown.appendChild(div);
+  });
+  dropdown.style.display = lista.length ? "block" : "none";
+}
+
+function seleccionarMotivo(m) {
+  searchInput.value = `${m.codigo} - ${m.descripcion}`;
+  motivoInput.value = m.codigo;
+  dropdown.style.display = "none";
+}
+
+function filtrarMotivos() {
+  const texto = searchInput.value.toLowerCase();
+  const filtrados = motivos.filter(m =>
+    m.descripcion.toLowerCase().includes(texto) ||
+    m.codigo.toString().includes(texto)
+  );
+  mostrarMotivos(filtrados);
+}
+
+// Mostrar todos al iniciar
+mostrarMotivos(motivos);
+
+// Ocultar lista si se hace clic fuera
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".select-search")) {
+    dropdown.style.display = "none";
+  }
+});
+</script>
+
 </body>
 </html>

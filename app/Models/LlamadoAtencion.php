@@ -27,6 +27,8 @@ class LlamadoAtencion extends Model
     'orientacion',
     'detalle',
     'ruta_pdf',
+    'codigo',
+    'descripcion',
 ];
 
 
