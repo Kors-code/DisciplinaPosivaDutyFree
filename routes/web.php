@@ -10,6 +10,7 @@ use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\AlertaInternaController;
 
+
 Route::get('/', function () {
     return redirect()->route('form.show');
 });
@@ -32,3 +33,7 @@ Route::get('/buscar-empleado/{cedula}', [EmpleadoController::class, 'buscarPorCe
 Route::get('/descargar-pdf', [FormatoController::class, 'descargarPDF'])->name('descargar.pdf');
 Route::get('/empleados', [ListController::class, 'mostrarEmpleados'])->name('empleados.list');
 Route::get('/Disciplinas', [ListController::class, 'mostrarDisciplinasPositivas'])->name('Disciplinas.list');
+
+
+Route::get('/empleados/export', [ListController::class, 'exportarEmpleadosExcel'])->name('exportar.empleados');
+Route::get('/disciplinas/export', [ListController::class, 'exportarDisciplinasExcel'])->name('disciplinas.export');
